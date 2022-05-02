@@ -8,36 +8,33 @@ const store = (data, name) => {
 };
 
 const getFromStorage = (name) => {
-  const storage = JSON.parse(localStorage.getItem(name));
-  const elements = [];
-  if (storage) storage.forEach((element) => elements.push(element));
-  return elements;
+  return JSON.parse(localStorage.getItem(name)) || [];
 };
 
 const insertTasksIntoDom = (tasks) => {
-  for (let i = 0; i < tasks.length; i += 1) {
+  tasks.forEach((task) => {
     appendChild(
       `
-    <li id="${tasks[i].id}" class="task p-1 text-gray border-b-1 flex justify-between items-center" 
-    data-index="${tasks[i].index}" tabindex="0" draggable="true">
+    <li id="${task.id}" class="task p-1 text-gray border-b-1 flex justify-between items-center" 
+    data-index="${task.index}" tabindex="0" draggable="true">
       <div class="w-full">
-        <label class="control control-checkbox" for="task-${i}">
+        <label class="control control-checkbox" for="task-${task.index}">
           <div class="w-full">
             <del>
-            <input type="text" data-input-id="${tasks[i].id}" 
-            class="task-text ${tasks[i].complete ? 'del' : ''}" value="${tasks[i].description}" disabled />
+            <input type="text" data-input-id="${task.id}" 
+            class="task-text ${task.complete ? 'del' : ''}" value="${task.description}" disabled />
       </del>
           </div>
-          <input type="checkbox" data-check-id="${tasks[i].id}" ${tasks[i].complete ? 'checked' : ''} />
+          <input type="checkbox" data-check-id="${task.id}" ${task.complete ? 'checked' : ''} />
           <div class="control-indicator"></div>
         </label>
       </div>
-      <button data-btn-id="${tasks[i].id}" 
+      <button data-btn-id="${task.id}" 
       class="flex items-center border-0 bg-inherit" data-status="edit"><span class="icon icon-dots" /></button>
     </li>`,
-      '#list',
+      '#list'
     );
-  }
+  });
 };
 
 const getTaskFromDom = (id) => {
@@ -57,9 +54,7 @@ const getTaskFromDom = (id) => {
 
 const taskBlur = (id) => {
   if (id) {
-    const {
-      task, text, btn, icon,
-    } = getTaskFromDom(id);
+    const { task, text, btn, icon } = getTaskFromDom(id);
     icon.classList.add('icon-dots');
     icon.classList.remove('icon-delete');
     task.classList.remove('bg-light-yellow');
@@ -72,9 +67,7 @@ const taskBlur = (id) => {
 
 const taskFocus = (id) => {
   if (id) {
-    const {
-      task, text, btn, icon,
-    } = getTaskFromDom(id);
+    const { task, text, btn, icon } = getTaskFromDom(id);
     icon.classList.remove('icon-dots');
     icon.classList.add('icon-delete');
     task.classList.add('bg-light-yellow');
@@ -86,6 +79,10 @@ const taskFocus = (id) => {
   return false;
 };
 
-export {
-  appendChild, store, getFromStorage, insertTasksIntoDom, getTaskFromDom, taskBlur, taskFocus,
+const updateIndex = () => {
+  listElement.childNodes.forEach((task) => {
+    dragDropSorting(task, list);
+  });
 };
+
+export { appendChild, store, getFromStorage, insertTasksIntoDom, getTaskFromDom, taskBlur, taskFocus };
